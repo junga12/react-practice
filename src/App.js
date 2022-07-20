@@ -1,65 +1,59 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import './App.css';
+import Header from './components/Header'
+import Nav from './components/Nav'
+import Article  from './components/Article';
+import Controller from './components/Controller';
+import { ControllerType } from './components/Controller';
 
-function Header() {
-  return <header>
-    <h1>
-      <a href="/">WEB</a>
-    </h1>
-  </header>
-}
+function getArticleContent(contents, selectedID, selectedController) {
+  let title = "Welcome"
+  let body = "Hello, WEB"
 
-function Nav(props) {
-  const getTitles = () => {
-    const result = [];
+  if (selectedController != null) {
+    title = selectedController
 
-    for (let i = 0; i < props.contents.length; i++) {
-      result.push(
-      <li>
-        <a id = {props.contents[i].id} href={"/read/"+props.contents[i].id} onClick={event=>{
-          event.preventDefault();
-          props.setSelectedID(props.contents[i].id);
-        }}>{props.contents[i].title}</a>
-      </li>
-      );
+    switch (selectedController) {
+      case ControllerType.CREATE:
+        body = "ccc"
+        break;
+      case ControllerType.UPDATE:
+        body = "uuu"
+        break;
+      default:
+        break;
     }
-
-    return result;
+  } else if (selectedID != null) {
+    title = contents[selectedID - 1].title
+    body = contents[selectedID - 1].body
+  } else {
+    title = "Welcome"
+    body = "Hello, WEB"
   }
 
-  return <nav>
-    <ol>
-      {getTitles()}
-    </ol>
-  </nav>
-}
-
-function Article(props) {
-  return <article>
-    <h2>{props.title}</h2>
-    {props.body}
-  </article>
+  return [title, body]
 }
 
 function App() {
-  const [selectedID, setSelectedID] = useState(null);
-
   const contents = [
-    {"id":1, "title":"html", body:"html is ..."},
-    {"id":2, "title":"css", body:"css is ..."},
-    {"id":3, "title":"javascript", body:"javascript is ..."}
+    { "id": 1, "title": "html", body: "html is ..." },
+    { "id": 2, "title": "css", body: "css is ..." },
+    { "id": 3, "title": "javascript", body: "javascript is ..." }
   ]
-  
+
+  const [selectedID, setSelectedID] = useState(null);
+  const [selectedController, setSelectedController] = useState(null);
+
+  let _selectedContent = getArticleContent(contents, selectedID, selectedController)
+  let title = _selectedContent[0]
+  let body = _selectedContent[1]
+
   return (
     <div>
-      <Header></Header>
-      <Nav contents={contents} setSelectedID={setSelectedID}></Nav>
-      <Article title="title" body="body"></Article>
-      <ul>
-        <li><a href='/create'>Create</a></li>
-        <li><a href='/update'>Update</a></li>
-        <li>Delete</li>
-      </ul>
+      <Header setSelectedID={setSelectedID} setSelectedController={setSelectedController}></Header>
+      <Nav contents={contents} setSelectedID={setSelectedID} setSelectedController={setSelectedController}></Nav>
+      <Article title={title} body={body}></Article>
+      <Controller selectedID={selectedID} setSelectedController={setSelectedController}></Controller>
     </div>
   );
 }
